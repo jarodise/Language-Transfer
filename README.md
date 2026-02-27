@@ -100,11 +100,23 @@ The tutor remembers you across sessions:
 - **Session notes** — detailed logs of each lesson with specific errors, breakthroughs, and next-session suggestions
 - **Error fingerprinting** — if you make the same mistake 3+ times, it becomes a tracked pattern the tutor actively works on
 
+## Recommended Models
+
+The tutor's behavior depends on the model's ability to follow nuanced instructions — Socratic restraint, one question at a time, not giving answers away. Smaller models tend to lecture, stack questions, and break character.
+
+| Tier | Models | Notes |
+|------|--------|-------|
+| ⭐ Best | Gemini 2.5 Pro, Claude Sonnet 4, GPT-4o | Follow complex persona instructions faithfully |
+| ✅ Good | Gemini 2.5 Flash, Claude Sonnet 3.5 | Solid balance of quality and speed |
+| ⚠️ Will struggle | Flash Lite, Haiku, GPT-4o-mini | Too fast/cheap to maintain teaching discipline |
+
 ## Credits
 
-- Teaching methodology inspired by [Language Transfer](https://www.languagetransfer.org/) by Mihalis Eleftheriou
-- The original Language Transfer course is free and available at [languagetransfer.org](https://www.languagetransfer.org/)
+- Teaching methodology inspired by [Language Transfer](https://www.languagetransfer.org/) by Mihalis Eleftheriou — a brilliant, free language course that teaches through guided discovery rather than memorization
+- This project is an homage to [Mihalis's work](https://www.languagetransfer.org/about). If you enjoy this tutor, please support the original Language Transfer project
+- The original Language Transfer courses (Spanish, French, Italian, German, Greek, Arabic, Turkish, Swahili, Music) are all free at [languagetransfer.org](https://www.languagetransfer.org/)
 
 ## License
 
 MIT
+
