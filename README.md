@@ -43,7 +43,7 @@ gemini
 ```bash
 cd Language-Transfer/
 claude
-# Type /spanish
+# Just say "let's start a lesson" — CLAUDE.md auto-loads the tutor
 ```
 
 The tutor will:
