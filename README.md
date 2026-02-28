@@ -51,33 +51,75 @@ The tutor will:
 2. Start teaching at your edge — where you know things but start to struggle
 3. Remember everything across sessions via local markdown files
 
-## What's Inside
+---
+
+## Architecture: Static vs Dynamic Files
+
+The most important design distinction. The workspace has two categories:
+
+### Static Files — The Tutor's Brain (36 files, never change)
+
+These define WHO the tutor is and WHAT it knows. Same for every student.
+
+| File | Purpose |
+|------|---------|
+| `IDENTITY.md` | Name, version, purpose |
+| `SOUL.md` | Personality & philosophy |
+| `AGENT.md` | Teaching method, session flow, behavioral rules **(the heart)** |
+| `GEMINI.md` | Auto-config + non-negotiable rules for Gemini CLI |
+| `CLAUDE.md` | Auto-config + non-negotiable rules for Claude Code |
+| `knowledge/concept-map.md` | A1→C2 topic index with prerequisites |
+| `knowledge/teaching-method.md` | The 6 Language Transfer principles |
+| `knowledge/teaching-examples.md` | 10 few-shot examples from the transcript |
+| `knowledge/error-patterns.md` | Common mistakes by CEFR level |
+| `knowledge/topics/*.md` (27 files) | Individual topic teaching guides, loaded on demand |
+
+### Dynamic Files — The Learner's Journey (evolve with each session)
+
+These track the individual student's progress. Start empty, grow over time.
+
+| File | Purpose | How It Changes |
+|------|---------|---------------|
+| `LEARNER.md` | Student profile: level, interests, goals | Filled in during first session, refined over time |
+| `memory/MEMORY.md` | Living progress tracker (~80 lines max) | Updated during and after every session |
+| `memory/sessions/YYYYMMDD.md` | Individual session logs | New file created each session |
+
+### How They Relate
 
 ```
-├── IDENTITY.md          # Who the tutor is
-├── SOUL.md              # Personality & philosophy
-├── AGENT.md             # Teaching method + session flow + rules (the heart)
-├── LEARNER.md           # Your profile (filled in during first session)
-├── GEMINI.md            # Auto-config for Gemini CLI
-├── CLAUDE.md            # Auto-config for Claude Code
-│
-├── knowledge/
-│   ├── concept-map.md        # A1→C2 topic graph with prerequisites
-│   ├── teaching-method.md    # The 6 Language Transfer principles
-│   ├── teaching-examples.md  # 10 few-shot examples from the transcript
-│   ├── error-patterns.md     # Common mistakes by level
-│   └── topics/               # 27 topic files (loaded on demand)
-│       ├── A1: cognates, pronunciation, es/no, quiero, present tense
-│       ├── A2: irregulars, pronouns, gustar, prepositions, reflexives
-│       ├── B1: preterite, imperfect, ser/estar, por/para, present perfect
-│       ├── B2: future/conditional, subjunctive, compound tenses
-│       ├── C1: past subjunctive, si-clauses, connectors, register
-│       └── C2: stylistic nuance, regional variation
-│
-└── memory/
-    ├── MEMORY.md         # Living learner profile (~80 lines, updated each session)
-    └── sessions/         # Dated session notes (created automatically)
+┌─────────────────────────────────────────┐
+│         STATIC (The Tutor)              │
+│                                         │
+│  IDENTITY ─── SOUL ─── AGENT           │
+│                 │                       │
+│           knowledge/                    │
+│    concept-map ── topics (27)           │
+│    teaching-method                      │
+│    teaching-examples                    │
+│    error-patterns                       │
+│                                         │
+│  Defines HOW the tutor teaches.         │
+│  Same for every student.               │
+└──────────────────┬──────────────────────┘
+                   │ reads ↓ writes ↓
+┌──────────────────▼──────────────────────┐
+│        DYNAMIC (The Student)            │
+│                                         │
+│  LEARNER.md ── memory/MEMORY.md         │
+│                    │                    │
+│              memory/sessions/           │
+│         2026-02-27.md                   │
+│         2026-02-28.md                   │
+│         ...                             │
+│                                         │
+│  Tracks WHERE the student is.           │
+│  Unique to each learner.               │
+└─────────────────────────────────────────┘
 ```
+
+Clone the repo → get the full tutor brain but a blank learner profile. The tutor assesses you fresh and builds your unique learning path.
+
+---
 
 ## The Teaching Method
 
@@ -99,10 +141,43 @@ The tutor remembers you across sessions:
 - **MEMORY.md** — compact profile: your level, solid concepts, shaky areas, recurring error patterns, what teaching approaches work for you
 - **Session notes** — detailed logs of each lesson with specific errors, breakthroughs, and next-session suggestions
 - **Error fingerprinting** — if you make the same mistake 3+ times, it becomes a tracked pattern the tutor actively works on
+- **Student meta-feedback** — tell the tutor "too many hints" or "more conversation" and it adapts permanently
+
+Memory saves happen **proactively during sessions**, not just at the end — so even if you close the terminal mid-lesson, your progress is preserved.
+
+---
+
+## Learnings: Building a Language Teaching Agent
+
+### 1. LLMs Give Away Answers Compulsively
+LLMs are trained to be helpful. A tutor must sometimes be *deliberately unhelpful*. We had to add explicit rules with BAD/GOOD examples showing what NOT to do.
+
+### 2. LLMs Stack Questions
+Instead of one question and waiting, the tutor asks 2-3 at once. Rule #1: "ONE question per message. Ask, then STOP."
+
+### 3. Rules at the Bottom Get Ignored
+Critical behavioral rules must go at the TOP of the first file the model reads. We moved them to `GEMINI.md` / `CLAUDE.md` as "NON-NEGOTIABLE RULES."
+
+### 4. Model Quality Matters Enormously
+Small models break character constantly. The tutor needs high instruction-following capability for Socratic restraint and patience.
+
+### 5. Sessions End Without Warning
+Users close terminals without saying goodbye. Memory must save incrementally during the session, not just at exit.
+
+### 6. LLMs Get Stuck in Topic Loops
+Once teaching subjunctive, it drills subjunctive forever. Topic rotation rule: switch after 5-6 exchanges, then circle back.
+
+### 7. The Student Should Teach the Teacher
+Students can give meta-feedback about teaching style. Methodology stays fixed; delivery adapts.
+
+### 8. LLMs Write Like Documents, Not People
+Markdown formatting in conversation feels robotic. Rule: "Write like a person talking, not a document."
+
+**The paradox**: The hardest part isn't telling the agent what to teach. It's telling it what NOT to do. The agent already knew Spanish grammar. What it didn't know was when to shut up.
+
+---
 
 ## Recommended Models
-
-The tutor's behavior depends on the model's ability to follow nuanced instructions — Socratic restraint, one question at a time, not giving answers away. Smaller models tend to lecture, stack questions, and break character.
 
 | Tier | Models | Notes |
 |------|--------|-------|
@@ -119,4 +194,3 @@ The tutor's behavior depends on the model's ability to follow nuanced instructio
 ## License
 
 MIT
-
